@@ -1,3 +1,6 @@
+from os.path import exists
+
+
 class Product:
     def __init__(self, name: str, weight: float, category: str):
         """
@@ -21,11 +24,22 @@ class Shop:
     def __init__(self):
         self.__file_name = 'products.txt'
 
+    def __write_file(self, file_products: str):
+        with open(self.__file_name, 'w') as f:
+            f.write(file_products)
+
     def get_products(self):
         """
         считывает всю информацию из файла __file_name,
         закрывает его и возвращает единую строку со всеми товарами из файла __file_name.
         """
+        if exists(self.__file_name):
+            with open(self.__file_name, 'r') as f:
+                file_products = f.read()
+        else:
+            file_products = ""
+
+        return file_products
 
     def add(self, *products):
         """
@@ -34,6 +48,17 @@ class Shop:
         если его ещё нет в файле (по названию).
         Если такой продукт уже есть, то не добавляет и выводит строку 'Продукт <название> уже есть в магазине'
         """
+        file_products = self.get_products()
+        need_update = False
+        for new_product in products:
+            if str(new_product)+'\n' in file_products:
+                print(f'Продукт {new_product} уже есть в магазине')
+            else:
+                file_products += str(new_product)+'\n'
+                need_update = True
+
+        if need_update:
+            self.__write_file(file_products)
 
 
 def test():
@@ -65,6 +90,9 @@ def test():
     Potato, 5.5, Vegetables
     
     Как выглядит файл после запусков:
+    Potato, 50.5, Vegetables
+    Spaghetti, 3.4, Groceries
+    Potato, 5.5, Vegetables
     """
 
 
