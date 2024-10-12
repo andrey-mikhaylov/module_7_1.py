@@ -13,11 +13,16 @@ class Product:
         self.weight = weight
         self.category = category
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         :return: строку в формате '<название>, <вес>, <категория>'. Все данные в строке разделены запятой с пробелами.
         """
         return f'{self.name}, {self.weight}, {self.category}'
+
+    def __add__(self, other: str) -> str:
+        if not isinstance(other, str):
+            raise
+        return str(self) + other
 
 
 class Shop:
@@ -25,36 +30,39 @@ class Shop:
         self.__file_name = 'products.txt'
 
     def __write_file(self, file_products: str):
+        """
+        запись в __file_name текста из file_products
+        :param file_products: текст для записи
+        """
         with open(self.__file_name, 'w') as f:
             f.write(file_products)
 
-    def get_products(self):
+    def get_products(self) -> str:
         """
         считывает всю информацию из файла __file_name,
         закрывает его и возвращает единую строку со всеми товарами из файла __file_name.
         """
-        if exists(self.__file_name):
-            with open(self.__file_name, 'r') as f:
-                file_products = f.read()
-        else:
-            file_products = ""
+        if not exists(self.__file_name):
+            return ""
+
+        with open(self.__file_name, 'r') as f:
+            file_products = f.read()
 
         return file_products
 
-    def add(self, *products):
+    def add(self, *products: Product):
         """
-        принимает неограниченное количество объектов класса Product.
-        Добавляет в файл __file_name каждый продукт из products,
-        если его ещё нет в файле (по названию).
+        Добавляет в файл __file_name каждый продукт из products, если его ещё нет в файле (по названию).
         Если такой продукт уже есть, то не добавляет и выводит строку 'Продукт <название> уже есть в магазине'
+        :param products: неограниченное количество объектов класса Product.
         """
         file_products = self.get_products()
         need_update = False
         for new_product in products:
-            if str(new_product)+'\n' in file_products:
+            if new_product+'\n' in file_products:
                 print(f'Продукт {new_product} уже есть в магазине')
             else:
-                file_products += str(new_product)+'\n'
+                file_products += new_product+'\n'
                 need_update = True
 
         if need_update:
